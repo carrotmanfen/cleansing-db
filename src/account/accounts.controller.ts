@@ -8,11 +8,28 @@ import { Account } from './account.model';
 export class AccountController {
   constructor(private readonly accountService:AccountService){}
 
+  @Get('/all')
+  @ApiResponse({ status: 200, description: 'Returns the greeting message' })
+  async getAllAccount(){
+    const accounts = await this.accountService.findAll();
+    return accounts.map(account=>({
+        _id:account._id,
+        username:account.username,
+        password:account.password,
+        project:account.project
+    }));
+  }
+
   @Get()
   @ApiResponse({ status: 200, description: 'Returns the greeting message' })
-  async getAllBooks(){
-    const accounts = this.accountService.findAll();
-    return accounts;
+  async getAccount(
+    @Body('username') username:string
+  ){
+    const accounts = this.accountService.findByUsername(username);
+    if(accounts)
+        return accounts;
+    else
+        return "don't have account"
   }
 
   @Post()
@@ -22,5 +39,19 @@ export class AccountController {
   ): Promise<any>{
     const generatedId = await this.accountService.create(username,password)
     return {id:generatedId}
+  }
+
+  @Post('login')
+  async login(
+    @Body('username') username: string,
+    @Body('password') password: string,
+  ): Promise<any>{
+    const account = await this.accountService.checkUsernamePassword(username,password)
+    return {
+        _id:account._id,
+        username:account.username,
+        password:account.password,
+        project:account.project
+    }
   }
 }
