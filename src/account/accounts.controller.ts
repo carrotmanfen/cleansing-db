@@ -12,12 +12,15 @@ export class AccountController {
   @ApiResponse({ status: 200, description: 'Returns the greeting message' })
   async getAllAccount(){
     const accounts = await this.accountService.findAll();
-    return accounts.map(account=>({
+    return ({
+        status: 200,
+        message:"there is all account success",
+        results:accounts.map(account=>({
         _id:account._id,
         username:account.username,
         password:account.password,
         project:account.project
-    }));
+    }))})
   }
 
   @Get()
@@ -27,7 +30,11 @@ export class AccountController {
   ){
     const accounts = this.accountService.findByUsername(username);
     if(accounts)
-        return accounts;
+        return ({
+            status:200,
+            message:"this is that account",
+            results:accounts
+        });
     else
         return "don't have account"
   }
@@ -37,8 +44,17 @@ export class AccountController {
     @Body('username') username: string,
     @Body('password') password: string,
   ): Promise<any>{
-    const generatedId = await this.accountService.create(username,password)
-    return {id:generatedId}
+    const account = await this.accountService.create(username,password)
+    return ({
+        status: 200,
+        message:"register success",
+        results:{
+            _id:account._id,
+            username:account.username,
+            password:account.password,
+            project:account.project
+        }
+    })
   }
 
   @Post('login')
@@ -47,11 +63,15 @@ export class AccountController {
     @Body('password') password: string,
   ): Promise<any>{
     const account = await this.accountService.checkUsernamePassword(username,password)
-    return {
-        _id:account._id,
-        username:account.username,
-        password:account.password,
-        project:account.project
-    }
+    return ({
+        status: 200,
+        message:"login success",
+        results:{
+            _id:account._id,
+            username:account.username,
+            password:account.password,
+            project:account.project
+        }
+    })
   }
 }

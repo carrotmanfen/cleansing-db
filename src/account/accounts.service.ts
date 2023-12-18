@@ -35,7 +35,7 @@ export class AccountService {
             const newAccount = new this.accountModel({username:username, password:password, project:project})
             const res = await newAccount.save();
             console.log(res)
-            return res.id ;
+            return res ;
         }
     }
 
@@ -45,7 +45,7 @@ export class AccountService {
             if(account.password==password){
                 return account
             }
-            throw new BadRequestException('Something bad happened', { cause: new Error(), description: 'Password not correct' })
+            throw new BadRequestException('Something bad happened', { cause: new Error(), description: 'Password not correct    ' })
         }    
         else{
             throw new BadRequestException('Something bad happened', { cause: new Error(), description: 'Username is not valid' })
