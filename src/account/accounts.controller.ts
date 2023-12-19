@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, HttpCode } from '@nestjs/common';
 import { ApiTags, ApiResponse } from '@nestjs/swagger';
 import { AccountService } from './accounts.service';
 import { Account } from './account.model';
@@ -39,7 +39,7 @@ export class AccountController {
         return "don't have account"
   }
 
-  @Post()
+  @Post('/register')
   async createAccount(
     @Body('username') username: string,
     @Body('password') password: string,
@@ -58,6 +58,7 @@ export class AccountController {
   }
 
   @Post('/login')
+  @HttpCode(200)
   async login(
     @Body('username') username: string,
     @Body('password') password: string,
