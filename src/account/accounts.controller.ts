@@ -1,8 +1,20 @@
 import { Body, Controller, Get, Post, HttpCode } from '@nestjs/common';
-import { ApiTags, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiResponse, ApiBody, ApiProperty } from '@nestjs/swagger';
 import { AccountService } from './accounts.service';
 import { Account } from './account.model';
 
+class LoginDto {
+    @ApiProperty()
+    username: string;
+  
+    @ApiProperty()
+    password: string;
+  }
+
+class findUsernameDto {
+    @ApiProperty()
+    username: string
+}
 @Controller('accounts')
 @ApiTags('accounts') 
 export class AccountController {
@@ -24,6 +36,7 @@ export class AccountController {
   }
 
   @Get()
+  @ApiBody({type:findUsernameDto})
   @ApiResponse({ status: 200, description: 'Returns the greeting message' })
   async getAccount(
     @Body('username') username:string
@@ -40,6 +53,8 @@ export class AccountController {
   }
 
   @Post('/register')
+  @ApiBody({type:LoginDto})
+  @ApiResponse({ status: 201, description: 'Register' })
   async createAccount(
     @Body('username') username: string,
     @Body('password') password: string,
@@ -58,6 +73,8 @@ export class AccountController {
   }
 
   @Post('/login')
+  @ApiBody({type:LoginDto}) 
+  @ApiResponse({ status: 200, description: 'login' })
   @HttpCode(200)
   async login(
     @Body('username') username: string,
