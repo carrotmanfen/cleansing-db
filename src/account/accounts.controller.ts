@@ -57,7 +57,7 @@ export class AccountController {
     })
   }
 
-  @Post('login')
+  @Post('/login')
   async login(
     @Body('username') username: string,
     @Body('password') password: string,
