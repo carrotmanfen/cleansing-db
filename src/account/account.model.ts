@@ -6,7 +6,7 @@ export const AccountSchema = new mongoose.Schema({
     project: {type:Array, required:false}
 });
 
-export interface Account{
+export interface Account extends mongoose.Document{
     _id: string;
     username: string;
     password: string;

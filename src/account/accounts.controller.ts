@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, HttpCode } from '@nestjs/common';
+import { Body, Controller, Get, Post, HttpCode, Patch } from '@nestjs/common';
 import { ApiTags, ApiResponse, ApiBody, ApiProperty } from '@nestjs/swagger';
 import { AccountService } from './accounts.service';
 import { Account } from './account.model';
@@ -11,10 +11,19 @@ class LoginDto {
     password: string;
   }
 
-class findUsernameDto {
+class FindUsernameDto {
     @ApiProperty()
     username: string
 }
+
+class UpdateProjectDto {
+    @ApiProperty()
+    username: string
+
+    @ApiProperty()
+    project: string
+}
+
 @Controller('accounts')
 @ApiTags('accounts') 
 export class AccountController {
@@ -28,15 +37,15 @@ export class AccountController {
         status: 200,
         message:"there is all account success",
         results:accounts.map(account=>({
-        _id:account._id,
-        username:account.username,
-        password:account.password,
-        project:account.project
+            _id:account._id,
+            username:account.username,
+            password:account.password,
+            project:account.project
     }))})
   }
 
   @Get()
-  @ApiBody({type:findUsernameDto})
+  @ApiBody({type:FindUsernameDto})
   @ApiResponse({ status: 200, description: 'Returns the greeting message' })
   async getAccount(
     @Body('username') username:string
@@ -84,6 +93,27 @@ export class AccountController {
     return ({
         status: 200,
         message:"login success",
+        results:{
+            _id:account._id,
+            username:account.username,
+            password:account.password,
+            project:account.project
+        }
+    })
+  }
+
+  @Patch('addProject')
+  @ApiBody({type:UpdateProjectDto})
+  @ApiResponse({ status: 200, description: 'login' })
+  @HttpCode(200)
+  async addProject (
+    @Body('username') username: string,
+    @Body('project') project: string,
+  ){
+    const account = await this.accountService.updateAccount(username, project)
+    return ({
+        status: 200,
+        message:"add project success",
         results:{
             _id:account._id,
             username:account.username,

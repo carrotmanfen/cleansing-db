@@ -17,10 +17,10 @@ export class AccountService {
         return accounts
     }
 
-    async findByUsername(username: string): Promise<Account | null> {
+    async findByUsername(username: string) {
         const account = await this.accountModel.findOne({ username: { $eq: username } }).exec();
         if(account)
-            return account;
+            return {_id:account._id, username:account.username, password:account.password, project:account.project};
         else
             throw new NotFoundException('Could not find account')
     }
@@ -40,7 +40,7 @@ export class AccountService {
     }
 
     async checkUsernamePassword(username: string, password:string){
-        const account = await this.accountModel.findOne({ username: { $eq: username } }).exec();
+        const account = await this.findByUsername(username)
         if(account){
             if(account.password==password){
                 return account
@@ -50,5 +50,21 @@ export class AccountService {
         else{
             throw new BadRequestException('Something bad happened', { cause: new Error(), description: 'Username is not valid' })
         }
+    }
+
+    async updateAccount (username: string, project:string){
+        console.log(username)
+        console.log(project)
+        const account = await this.accountModel.findOne({username:{$eq:username}}).exec();
+        if(account){
+            account.project = [...account.project, project]
+            console.log(project)
+            account.save()
+            return(account) 
+        }    
+        else{
+            throw new BadRequestException('Something bad happened', { cause: new Error(), description: 'Username is not valid' })
+        }
+
     }
 }
