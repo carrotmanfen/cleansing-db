@@ -52,13 +52,17 @@ export class AccountService {
         }
     }
 
-    async updateAccount (username: string, project:string){
+    async updateAccount (username: string, project_id:string, project_name:string, file_name:string){
         console.log(username)
-        console.log(project)
+        console.log(project_id)
         const account = await this.accountModel.findOne({username:{$eq:username}}).exec();
         if(account){
-            account.project = [...account.project, project]
-            console.log(project)
+            const newProject = {
+                _id:project_id,
+                project_name:project_name,
+                file_name:file_name
+            }
+            account.project = [...account.project, newProject]
             account.save()
             return(account) 
         }    

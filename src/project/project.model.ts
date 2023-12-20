@@ -5,6 +5,8 @@ export const ProjectSchema = new mongoose.Schema({
     data_set: {type: Object, required: true},
     clean: {type:Array, required: false},
     latest_edit: {type:String, required: false},
+    project_name: {type:String, required: true},
+    file_name: {type:String, required: true},
 });
 
 export interface Project{
@@ -13,4 +15,6 @@ export interface Project{
     clean: Array<any>;
     latest_edit: string;
     data_set: object;
+    project_name: string;
+    file_name: string;
 }

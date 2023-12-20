@@ -1,5 +1,5 @@
-import { Body, Controller, Get, Post, HttpCode, Patch } from '@nestjs/common';
-import { ApiTags, ApiResponse, ApiBody, ApiProperty } from '@nestjs/swagger';
+import { Body, Controller, Get, Post, HttpCode, Patch, Param } from '@nestjs/common';
+import { ApiTags, ApiResponse, ApiBody, ApiProperty, ApiQuery, ApiParam } from '@nestjs/swagger';
 import { AccountService } from './accounts.service';
 import { Account } from './account.model';
 
@@ -21,7 +21,13 @@ class UpdateProjectDto {
     username: string
 
     @ApiProperty()
-    project: string
+    project_id: string
+
+    @ApiProperty()
+    project_name: string
+
+    @ApiProperty()
+    file_name:string
 }
 
 @Controller('accounts')
@@ -44,13 +50,14 @@ export class AccountController {
     }))})
   }
 
-  @Get()
-  @ApiBody({type:FindUsernameDto})
+  @Get(':username')
+  @ApiParam({ name: 'username', description: 'The username parameter' })
   @ApiResponse({ status: 200, description: 'Returns the greeting message' })
   async getAccount(
-    @Body('username') username:string
+    @Param('username') username:string
   ){
-    const accounts = this.accountService.findByUsername(username);
+    const accounts = await this.accountService.findByUsername(username);
+    console.log(accounts)
     if(accounts)
         return ({
             status:200,
@@ -108,9 +115,11 @@ export class AccountController {
   @HttpCode(200)
   async addProject (
     @Body('username') username: string,
-    @Body('project') project: string,
+    @Body('project_id') project_id: string,
+    @Body('project_name') project_name: string,
+    @Body('file_name') file_name: string,
   ){
-    const account = await this.accountService.updateAccount(username, project)
+    const account = await this.accountService.updateAccount(username, project_id, project_name, file_name)
     return ({
         status: 200,
         message:"add project success",

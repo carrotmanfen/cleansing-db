@@ -17,10 +17,19 @@ export class ProjectService {
         return projects
     }
 
-    async create(start_date: string, data_set:object){
+    async findById(project_id: string) {
+        console.log(project_id)
+        const project = await this.projectModel.findOne({ _id: { $eq: project_id } }).exec();
+        if(project)
+            return {project_id:project._id, project_name:project.project_name, file_name:project.file_name, data_set:project.data_set,  start_date:project.start_date, latest_edit:project.latest_edit, clean:project.clean};
+        else
+            throw new NotFoundException('Could not find project')
+    }
+
+    async create(start_date: string, data_set:object, project_name: string, file_name: string){
         const latest_edit = start_date;
         const clean = new Array()
-        const newProject = new this.projectModel({start_date:start_date, data_set:data_set, latest_edit:latest_edit, clean: clean})
+        const newProject = new this.projectModel({start_date:start_date, data_set:data_set, latest_edit:latest_edit, clean: clean, project_name: project_name, file_name: file_name})
         const res = await newProject.save();
         console.log(res)
         if(res){
