@@ -36,10 +36,12 @@ export class ProjectController {
             message:"there is all project success",
             results:projects.map(project=>({
                 _id:project._id,
+                project_name:project.project_name,
+                file_name:project.file_name,
                 start_date:project.start_date,
                 data_set:project.data_set,
                 clean:project.clean,
-                latest_edit:project.latest_edit
+                latest_edit:project.latest_edit,
                 })
             )
         })
@@ -77,6 +79,8 @@ export class ProjectController {
             message:"register success",
             results:{
                 _id:project._id,
+                project_name:project.project_name,
+                file_name:project.file_name,
                 start_date:project.start_date,
                 data_set:project.data_set,
                 latest_edit:project.latest_edit,
