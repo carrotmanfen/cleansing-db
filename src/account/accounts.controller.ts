@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, HttpCode, Patch, Param } from '@nestjs/common';
+import { Body, Controller, Get, Post, HttpCode, Patch, Param, Delete } from '@nestjs/common';
 import { ApiTags, ApiResponse, ApiBody, ApiProperty, ApiQuery, ApiParam } from '@nestjs/swagger';
 import { AccountService } from './accounts.service';
 import { Account } from './account.model';
@@ -11,9 +11,12 @@ class LoginDto {
     password: string;
   }
 
-class FindUsernameDto {
+class DeleteProjectInAccount {
     @ApiProperty()
     username: string
+
+    @ApiProperty()
+    project_id: string
 }
 
 class UpdateProjectDto {
@@ -131,4 +134,26 @@ export class AccountController {
         }
     })
   }
+
+  @Delete('/deleteProjectInAccount')
+    @ApiBody({type:DeleteProjectInAccount})
+    @HttpCode(200)
+    @ApiResponse({ status: 200, description: 'delete project in account' })
+    async deleteProject(
+      @Body('username') username: string,
+      @Body('project_id') project_id: string,
+    ){
+        const account = await this.accountService.deleteProjectInAccount(username, project_id)
+        return ({
+            status: 200,
+            message:"delete success",
+            results:{
+              _id:account._id,
+              username:account.username,
+              password:account.password,
+              project:account.project
+            }
+        })
+    }
+
 }

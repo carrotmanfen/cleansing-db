@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, HttpCode, Param } from '@nestjs/common';
+import { Body, Controller, Get, Post, HttpCode, Param, Delete } from '@nestjs/common';
 import { ApiTags, ApiResponse, ApiBody, ApiProperty, ApiParam } from '@nestjs/swagger';
 import { ProjectService } from './projects.service';
 import { Project } from './project.model';
@@ -81,6 +81,23 @@ export class ProjectController {
                 data_set:project.data_set,
                 latest_edit:project.latest_edit,
                 clean:project.clean
+            }
+        })
+    }
+
+    @Delete('/deleteProject/:id')
+    @ApiParam({ name: 'id', description: 'The project_id parameter' })
+    @HttpCode(200)
+    @ApiResponse({ status: 200, description: 'delete' })
+    async deleteProject(
+        @Param('id') project_id:string
+    ){
+        const project = await this.projectService.deleteProject(project_id)
+        return ({
+            status: 200,
+            message:"register success",
+            results:{
+                message:project
             }
         })
     }

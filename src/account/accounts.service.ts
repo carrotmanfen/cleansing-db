@@ -71,4 +71,29 @@ export class AccountService {
         }
 
     }
+
+    async deleteProjectInAccount(username: string, project_id: string) {
+        
+        const account = await this.accountModel.findOne({username:{$eq:username}}).exec();
+        if(account){
+            const objectIndex = account.project.findIndex(obj => obj._id === project_id);
+            console.log(objectIndex)
+            if (objectIndex !== -1) {
+                // Remove the object from the project array
+                account.project.splice(objectIndex, 1);
+
+                // Save the updated account
+                await account.save();
+                console.log(account)
+                // Return the updated account information
+                return account
+            }else{
+                throw new NotFoundException('Could not find project in account '+username)    
+            }
+        }    
+        else{
+            throw new NotFoundException('Could not find account')
+        }
+      }
+
 }

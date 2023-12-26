@@ -38,4 +38,15 @@ export class ProjectService {
             throw new BadRequestException('Something bad happened', { cause: new Error(), description: 'Does not have this account' })
         }
     }
+
+    async deleteProject(project_id : string){
+        console.log(project_id)
+        const result = await this.projectModel.deleteOne({_id:project_id}).exec()
+        console.log(result)
+        if(result.deletedCount===0) {
+            throw new NotFoundException('Could not find project to delete or delete failed')
+        }else{
+            return "deleted project : "+project_id
+        }
+    }
 }
