@@ -52,7 +52,7 @@ export class AccountService {
         }
     }
 
-    async updateAccount (username: string, project_id:string, project_name:string, file_name:string){
+    async updateProjectOfAccount (username: string, project_id:string, project_name:string, file_name:string){
         console.log(username)
         console.log(project_id)
         const account = await this.accountModel.findOne({username:{$eq:username}}).exec();
@@ -93,6 +93,38 @@ export class AccountService {
         }    
         else{
             throw new NotFoundException('Could not find account')
+        }
+      }
+
+      async updateProjectNameOfAccount(username: string, project_id: string, project_name: string) {
+        try {
+          const account = await this.accountModel.findOne({ username: { $eq: username } }).exec();
+      
+          if (account) {
+            const projectIndex = account.project.findIndex((p) => p._id === project_id);
+            console.log(projectIndex)
+            if (projectIndex !== -1) {
+            //   account.project[projectIndex].project_name = project_name;
+              const newProject = {
+                _id:project_id,
+                project_name:project_name,
+                file_name:account.project[projectIndex].file_name
+            }
+            account.project.splice(projectIndex, 1);
+            account.project = [newProject, ...account.project]
+              await account.save(); // Make sure to await the save operation
+              console.log(account)
+              return account;
+            } else {
+              throw new BadRequestException('Project in account is not valid');
+            }
+
+          } else {
+            throw new BadRequestException('Username is not valid');
+          }
+        } catch (error) {
+          console.error(error); // Log any errors to help diagnose the issue
+          throw new BadRequestException('Failed to update project name');
         }
       }
 

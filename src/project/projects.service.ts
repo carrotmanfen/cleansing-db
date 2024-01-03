@@ -49,4 +49,20 @@ export class ProjectService {
             return "deleted project : "+project_id
         }
     }
+
+    async updateProjectName (project_id:string, project_name:string){
+        console.log(project_id)
+        const project = await this.projectModel.findOne({_id:{$eq:project_id}}).exec();
+        if(project){
+            project.project_name = project_name
+            project.save()
+            return(project) 
+        }    
+        else{
+            throw new BadRequestException('Something bad happened', { cause: new Error(), description: 'Username is not valid' })
+        }
+
+    }
+
+
 }

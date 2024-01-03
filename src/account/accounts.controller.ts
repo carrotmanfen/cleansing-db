@@ -33,6 +33,18 @@ class UpdateProjectDto {
     file_name:string
 }
 
+class UpdateNameDto {
+    @ApiProperty()
+    username: string
+
+    @ApiProperty()
+    project_id: string
+
+    @ApiProperty()
+    project_name: string
+
+}
+
 @Controller('accounts')
 @ApiTags('accounts') 
 export class AccountController {
@@ -122,7 +134,7 @@ export class AccountController {
     @Body('project_name') project_name: string,
     @Body('file_name') file_name: string,
   ){
-    const account = await this.accountService.updateAccount(username, project_id, project_name, file_name)
+    const account = await this.accountService.updateProjectOfAccount(username, project_id, project_name, file_name)
     return ({
         status: 200,
         message:"add project success",
@@ -149,6 +161,28 @@ export class AccountController {
             message:"delete success",
             results:{
               _id:account._id,
+              username:account.username,
+              password:account.password,
+              project:account.project
+            }
+        })
+    }
+
+    @Patch('updateProjectName')
+    @ApiBody({ type: UpdateNameDto })
+    @ApiResponse({ status: 200, description: 'login' })
+    @HttpCode(200)
+    async updateProjectName(
+        @Body('username') username: string,
+        @Body('project_id') project_id: string,
+        @Body('project_name') project_name: string,
+    ) {
+        const account = await this.accountService.updateProjectNameOfAccount(username,  project_id, project_name)
+        return ({
+            status: 200,
+            message: "update project_name in account success",
+            results: {
+                _id:account._id,
               username:account.username,
               password:account.password,
               project:account.project
