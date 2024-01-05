@@ -116,10 +116,10 @@ export class AccountController {
         status: 200,
         message:"login success",
         results:{
-            _id:account._id,
-            username:account.username,
-            password:account.password,
-            project:account.project
+            _id:account.account._id,
+            username:account.account.username,
+            password:account.account.password,
+            project:account.account.project
         }
     })
   }

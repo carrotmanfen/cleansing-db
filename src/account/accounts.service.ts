@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
 import { Account } from './account.model';
 import { Model } from 'mongoose';
+import * as moment from 'moment';
 
 @Injectable()
 export class AccountService {
@@ -18,11 +19,28 @@ export class AccountService {
     }
 
     async findByUsername(username: string) {
-        const account = await this.accountModel.findOne({ username: { $eq: username } }).exec();
-        if(account)
-            return {_id:account._id, username:account.username, password:account.password, project:account.project};
-        else
-            throw new NotFoundException('Could not find account')
+        const result = await this.accountModel.aggregate([
+            { $match: { username: username } },
+            { $unwind: '$project' },
+            { $sort: {'project.last_edit': -1}},
+            {
+                $group: {
+                  _id: '$_id',
+                  username: { $first: '$username' },
+                  password: { $first: '$password' },
+                  project: { $push: '$project' },
+                },
+            },
+          ]).exec();
+        
+          if (result.length > 0) {
+            const account = result[0]; // Since we expect only one document due to the username match
+            return {
+                account
+            };
+          } else {
+            throw new NotFoundException('Could not find account');
+          }
     }
 
     async create(username: string, password:string){
@@ -42,35 +60,41 @@ export class AccountService {
     async checkUsernamePassword(username: string, password:string){
         const account = await this.findByUsername(username)
         if(account){
-            if(account.password==password){
+            if(account.account.password==password){
                 return account
             }
-            throw new BadRequestException('Something bad happened', { cause: new Error(), description: 'Password not correct    ' })
+            throw new BadRequestException('Something bad happened', { cause: new Error(), description: 'Password not correct' })
         }    
         else{
             throw new BadRequestException('Something bad happened', { cause: new Error(), description: 'Username is not valid' })
         }
     }
 
-    async updateProjectOfAccount (username: string, project_id:string, project_name:string, file_name:string){
-        console.log(username)
-        console.log(project_id)
-        const account = await this.accountModel.findOne({username:{$eq:username}}).exec();
-        if(account){
-            const newProject = {
-                _id:project_id,
-                project_name:project_name,
-                file_name:file_name
-            }
-            account.project = [...account.project, newProject]
-            account.save()
-            return(account) 
-        }    
-        else{
-            throw new BadRequestException('Something bad happened', { cause: new Error(), description: 'Username is not valid' })
+    async updateProjectOfAccount(username: string, project_id: string, project_name: string, file_name: string) {
+        console.log(username);
+        console.log(project_id);
+      
+        const account = await this.accountModel.findOne({ username: { $eq: username } }).exec();
+      
+        if (account) {
+          const newProject = {
+            _id: project_id,
+            project_name: project_name,
+            file_name: file_name,
+            last_edit: moment().format('YYYY/MM/DD HH:mm:ss'),
+          };
+      
+          account.project = [newProject, ...account.project];
+          await account.save(); // Make sure to use await here to wait for the save operation to complete
+      
+          return account;
+        } else {
+          throw new BadRequestException('Something bad happened', {
+            cause: new Error(),
+            description: 'Username is not valid',
+          });
         }
-
-    }
+      }
 
     async deleteProjectInAccount(username: string, project_id: string) {
         
@@ -108,7 +132,8 @@ export class AccountService {
               const newProject = {
                 _id:project_id,
                 project_name:project_name,
-                file_name:account.project[projectIndex].file_name
+                file_name:account.project[projectIndex].file_name,
+                last_edit: moment().format('YYYY/MM/DD HH:mm:ss'),
             }
             account.project.splice(projectIndex, 1);
             account.project = [newProject, ...account.project]
