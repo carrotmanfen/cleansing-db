@@ -21,15 +21,15 @@ export class ProjectService {
         console.log(project_id)
         const project = await this.projectModel.findOne({ _id: { $eq: project_id } }).exec();
         if(project)
-            return {project_id:project._id, project_name:project.project_name, file_name:project.file_name, data_set:project.data_set,  start_date:project.start_date, latest_edit:project.latest_edit, clean:project.clean};
+            return {project_id:project._id, data_set:project.data_set, clean:project.clean};
         else
             throw new NotFoundException('Could not find project')
     }
 
-    async create(start_date: string, data_set:object, project_name: string, file_name: string){
-        const latest_edit = start_date;
+    async create(data_set:object){
+        
         const clean = new Array()
-        const newProject = new this.projectModel({start_date:start_date, data_set:data_set, latest_edit:latest_edit, clean: clean, project_name: project_name, file_name: file_name})
+        const newProject = new this.projectModel({ data_set:data_set, clean: clean})
         const res = await newProject.save();
         console.log(res)
         if(res){
@@ -48,20 +48,6 @@ export class ProjectService {
         }else{
             return "deleted project : "+project_id
         }
-    }
-
-    async updateProjectName (project_id:string, project_name:string){
-        console.log(project_id)
-        const project = await this.projectModel.findOne({_id:{$eq:project_id}}).exec();
-        if(project){
-            project.project_name = project_name
-            project.save()
-            return(project) 
-        }    
-        else{
-            throw new BadRequestException('Something bad happened', { cause: new Error(), description: 'Username is not valid' })
-        }
-
     }
 
 

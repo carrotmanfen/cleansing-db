@@ -4,8 +4,6 @@ import { ProjectService } from './projects.service';
 import { Project } from './project.model';
 
 class CreateProjectDto {
-    @ApiProperty()
-    start_date: string;
 
     @ApiProperty()
     data_set: object;
@@ -15,11 +13,6 @@ class CreateProjectDto {
 
     @ApiProperty()
     file_name: string
-}
-
-class FindProject {
-    @ApiProperty()
-    project_id: string
 }
 
 class UpdateProjectNameDto {
@@ -46,12 +39,8 @@ export class ProjectController {
             message: "there is all project success",
             results: projects.map(project => ({
                 _id: project._id,
-                project_name: project.project_name,
-                file_name: project.file_name,
-                start_date: project.start_date,
                 data_set: project.data_set,
                 clean: project.clean,
-                latest_edit: project.latest_edit,
             })
             )
         })
@@ -78,22 +67,15 @@ export class ProjectController {
     @ApiBody({ type: CreateProjectDto })
     @ApiResponse({ status: 201, description: 'Register' })
     async createProject(
-        @Body('start_date') start_date: string,
         @Body('data_set') data_set: object,
-        @Body('project_name') project_name: string,
-        @Body('file_name') file_name: string,
     ): Promise<any> {
-        const project = await this.projectService.create(start_date, data_set, project_name, file_name)
+        const project = await this.projectService.create(data_set)
         return ({
             status: 200,
             message: "register success",
             results: {
                 _id: project._id,
-                project_name: project.project_name,
-                file_name: project.file_name,
-                start_date: project.start_date,
                 data_set: project.data_set,
-                latest_edit: project.latest_edit,
                 clean: project.clean
             }
         })
@@ -112,25 +94,6 @@ export class ProjectController {
             message: "register success",
             results: {
                 message: project
-            }
-        })
-    }
-
-    @Patch('updateProjectName')
-    @ApiBody({ type: UpdateProjectNameDto })
-    @ApiResponse({ status: 200, description: 'login' })
-    @HttpCode(200)
-    async updateProjectName(
-        @Body('project_id') project_id: string,
-        @Body('project_name') project_name: string,
-    ) {
-        const project = await this.projectService.updateProjectName( project_id, project_name)
-        return ({
-            status: 200,
-            message: "update project_name success",
-            results: {
-                _id: project._id,
-                project_name: project.project_name,
             }
         })
     }
