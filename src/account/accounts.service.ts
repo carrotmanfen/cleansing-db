@@ -21,7 +21,12 @@ export class AccountService {
     async findByUsername(username: string) {
         const result = await this.accountModel.aggregate([
             { $match: { username: username } },
-            { $unwind: '$project' },
+            {
+                $unwind: {
+                  path: '$project',
+                  preserveNullAndEmptyArrays: true, // Add this line to handle empty arrays
+                },
+              },
             { $sort: {'project.last_edit': -1}},
             {
                 $group: {
