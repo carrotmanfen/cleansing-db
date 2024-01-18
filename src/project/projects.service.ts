@@ -26,7 +26,7 @@ export class ProjectService {
             throw new NotFoundException('Could not find project')
     }
 
-    async create(data_set:object, clean:string){
+    async create(data_set:object, clean:object){
         const newProject = new this.projectModel({ data_set:data_set, clean: clean})
         const res = await newProject.save();
         console.log(res)
