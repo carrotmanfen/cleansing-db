@@ -45,6 +45,18 @@ class UpdateNameDto {
 
 }
 
+class UpdateCleanDto {
+    @ApiProperty()
+    username: string
+
+    @ApiProperty()
+    project_id: string
+
+    @ApiProperty()
+    project_clean: string
+
+}
+
 @Controller('accounts')
 @ApiTags('accounts') 
 export class AccountController {
@@ -183,6 +195,28 @@ export class AccountController {
             message: "update project_name in account success",
             results: {
                 _id:account._id,
+              username:account.username,
+              password:account.password,
+              project:account.project
+            }
+        })
+    }
+
+    @Patch('updateClean')
+    @ApiBody({ type: UpdateCleanDto })
+    @ApiResponse({ status: 200, description: 'login' })
+    @HttpCode(200)
+    async updateClean(
+        @Body('username') username: string,
+        @Body('project_id') project_id: string,
+        @Body('project_clean') project_clean: string,
+    ) {
+        const account = await this.accountService.updateClean(username,  project_id, project_clean)
+        return ({
+            status: 200,
+            message: "update project_name in account success",
+            results: {
+              _id:account._id,
               username:account.username,
               password:account.password,
               project:account.project

@@ -9,10 +9,7 @@ class CreateProjectDto {
     data_set: object;
 
     @ApiProperty()
-    project_name: string
-
-    @ApiProperty()
-    file_name: string
+    clean: string;
 }
 
 class UpdateProjectNameDto {
@@ -68,8 +65,9 @@ export class ProjectController {
     @ApiResponse({ status: 201, description: 'Register' })
     async createProject(
         @Body('data_set') data_set: object,
+        @Body('clean') clean: string
     ): Promise<any> {
-        const project = await this.projectService.create(data_set)
+        const project = await this.projectService.create(data_set, clean)
         return ({
             status: 200,
             message: "register success",

@@ -158,4 +158,37 @@ export class AccountService {
         }
       }
 
+      async updateClean(username: string, project_id: string, project_clean: string) {
+        try {
+          const account = await this.accountModel.findOne({ username: { $eq: username } }).exec();
+      
+          if (account) {
+            const projectIndex = account.project.findIndex((p) => p._id === project_id);
+            console.log(projectIndex)
+            if (projectIndex !== -1) {
+            //   account.project[projectIndex].project_name = project_name;
+              const newProject = {
+                _id:project_clean,
+                project_name:account.project[projectIndex].project_name,
+                file_name:account.project[projectIndex].file_name,
+                last_edit: moment().format('YYYY/MM/DD HH:mm:ss'),
+            }
+            account.project.splice(projectIndex, 1);
+            account.project = [newProject, ...account.project]
+              await account.save(); // Make sure to await the save operation
+              console.log(account)
+              return account;
+            } else {
+              throw new BadRequestException('Project in account is not valid');
+            }
+
+          } else {
+            throw new BadRequestException('Username is not valid');
+          }
+        } catch (error) {
+          console.error(error); // Log any errors to help diagnose the issue
+          throw new BadRequestException('Failed to update project clean');
+        }
+      }
+
 }
