@@ -48,5 +48,18 @@ export class ProjectService {
         }
     }
 
+    async changeProject(project_id : string, data_set:object){
+        console.log(project_id)
+        const project = await this.projectModel.findOne({ _id: { $eq: project_id } }).exec();
+        console.log(project)
+        if(project){
+            project.data_set = data_set
+            const result = await project.save()
+            console.log(result)
+        }else{
+            throw new NotFoundException('Could not find project')
+        }
+    }
+
 
 }

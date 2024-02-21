@@ -15,10 +15,10 @@ class CreateProjectDto {
 class UpdateProjectNameDto {
 
     @ApiProperty()
-    project_id: string
+    project_id: string;
 
     @ApiProperty()
-    project_name: string
+    data_set: object;
 
 }
 
@@ -90,6 +90,24 @@ export class ProjectController {
         return ({
             status: 200,
             message: "register success",
+            results: {
+                message: project
+            }
+        })
+    }
+
+    @Patch('/changeProject')
+    @ApiBody({ type: UpdateProjectNameDto })
+    @HttpCode(200)
+    @ApiResponse({ status: 200, description: 'change' })
+    async changeProject(
+        @Body('id') project_id: string,
+        @Body('data_set') data_set: object
+    ) {
+        const project = await this.projectService.changeProject(project_id, data_set)
+        return ({
+            status: 200,
+            message: "change success",
             results: {
                 message: project
             }
